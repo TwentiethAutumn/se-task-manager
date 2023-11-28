@@ -18,7 +18,7 @@ class UserEventsSubscriber {
     lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
     @PostConstruct
-    fun init() {
+    fun init() { //todo убрать лишние сабскрайберов
         subscriptionsManager.createSubscriber(UserAggregate::class, "UserAggregateSubscriber") {
 
             `when`(UserCreatedEvent::class) { event ->

@@ -17,7 +17,7 @@ class TaskEventsSubscriber {
     lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
     @PostConstruct
-    fun init() {
+    fun init() { //todo убрать лишние сабскрайберов
         subscriptionsManager.createSubscriber(TaskAggregate::class, "TaskAggregateSubscriber") {
 
             `when`(TaskRenamedEvent::class) { event ->

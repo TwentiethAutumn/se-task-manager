@@ -62,7 +62,7 @@ class TaskStatusRelation(
     }
 }
 
-@Document("task-status-projection")
+@Document("task-status-projection") //todo: в доке это было 2 таблицы
 data class TaskStatusProjection(
         var statusId: UUID?,
         var statusName: String?,

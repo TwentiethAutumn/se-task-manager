@@ -31,6 +31,6 @@ class UserController (
 
     @GetMapping("/{userId}")
     fun getUser(@PathVariable userId: UUID) : UserAggregateState? {
-        return userEsService.getState(userId)
+        return userEsService.getState(userId) //todo для запросов на чтение используем проекции
     }
 }

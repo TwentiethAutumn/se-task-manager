@@ -12,22 +12,22 @@ import java.util.*
 @RequestMapping("/projections")
 class ProjectionsController (val projectionsService: ProjectionsService) {
     @GetMapping("/userProjections")
-    fun getUserProjections() : List<UserProjection> {
+    fun getUserProjections() : List<UserProjection> { //todo: исправить на запросы из доки
         return this.projectionsService.getAllUserProjection();
     }
 
     @GetMapping("/taskStatusProjections")
-    fun getTaskStatusProjections() : List<TaskStatusProjection> {
+    fun getTaskStatusProjections() : List<TaskStatusProjection> { //todo: исправить на запросы из доки
         return this.projectionsService.getAllTaskStatusProjection();
     }
 
     @GetMapping("/projectUserProjections")
-    fun getProjectUserProjections() : List<ProjectUserProjection> {
+    fun getProjectUserProjections() : List<ProjectUserProjection> { //todo: исправить на запросы из доки
         return this.projectionsService.getAllProjectUserProjection();
     }
 
     @GetMapping("/projectTaskuser")
-    fun getTaskUserProjections() : List<ProjectTasksUserProjection>{
+    fun getTaskUserProjections() : List<ProjectTasksUserProjection>{ //todo: исправить на запросы из доки. Для 4 проекции это getProjectByID и listTasksInProject
         return this.projectionsService.getAllProjectTaskUserProjection();
     }
 }

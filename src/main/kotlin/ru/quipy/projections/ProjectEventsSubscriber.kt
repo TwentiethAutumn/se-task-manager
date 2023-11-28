@@ -18,7 +18,7 @@ class ProjectEventsSubscriber {
     lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
     @PostConstruct
-    fun init() {
+    fun init() { //todo убрать лишние сабскрайберов
         subscriptionsManager.createSubscriber(ProjectAggregate::class, "ProjectAggregateSubscriber") {
             `when`(StatusCreatedEvent::class) { event ->
                 logger.info("Tag created: {}", event.statusName)

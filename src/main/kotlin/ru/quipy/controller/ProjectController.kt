@@ -29,21 +29,24 @@ class ProjectController(
     }
 
     @PostMapping("/{projectId}/statuses")
-    fun createStatus(@PathVariable projectId: UUID, @RequestParam title: String) : StatusCreatedEvent{
+    fun createStatus(@PathVariable projectId: UUID, @RequestParam title: String) : StatusCreatedEvent{ //todo add color
         return projectEsService.update(projectId){
-            it.createStatus(title)
+            it.createStatus(title) //todo проверить, что пользователь сам состоит в проекте
         }
     }
 
+    //todo delete status
+    //todo edit status
+
     @GetMapping("/{projectId}")
     fun getProject(@PathVariable projectId: UUID) : ProjectAggregateState? {
-        return projectEsService.getState(projectId)
+        return projectEsService.getState(projectId) //todo для запросов на чтение используем проекции
     }
 
     @PostMapping("/{projectId}/{userId}")
     fun assignUserToProject(@PathVariable projectId: UUID, @PathVariable userId: UUID) : UserAssignedToProjectEvent {
         return projectEsService.update(projectId) {
-            it.assignUser(userId)
+            it.assignUser(userId) //todo проверить, что пользователь сам состоит в проекте
         }
     }
 }
