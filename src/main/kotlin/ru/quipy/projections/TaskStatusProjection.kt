@@ -1,8 +1,8 @@
 package ru.quipy.projections
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Component
@@ -19,7 +19,8 @@ import javax.annotation.PostConstruct
 
 @Component
 class TaskStatusRelation(
-        private val taskStatusProjectionRepo: TaskStatusProjectionRepo
+        private val taskStatusProjectionRepo: TaskStatusesProjectionRepo,
+        private val taskProjectionRepo: TaskProjectionRepo
 ) {
 
     @Autowired
@@ -30,43 +31,49 @@ class TaskStatusRelation(
         subscriptionsManager.createSubscriber(TaskAggregate::class, "TaskAggregateSubscriberTSProjection") {
 
             `when`(StatusAssignedToTaskEvent::class) { event ->
-                val status = taskStatusProjectionRepo.findByStatusIdAndStatusNameNotNull(event.statusId)
+                val status = taskStatusProjectionRepo.findById(event.statusId)
                         ?: throw Exception()
-                val task = taskStatusProjectionRepo.findByTaskId(event.taskId) ?: throw Exception()
+                val task = taskProjectionRepo.findByTaskId(event.taskId) ?: throw Exception()
                 task.statusId = event.statusId
-                task.statusName = status.statusName
                 task.taskUpdatedAt = System.currentTimeMillis();
-                taskStatusProjectionRepo.save(task);
+                taskProjectionRepo.save(task);
             }
 
             `when`(TaskRenamedEvent::class) { event ->
-                val taskStatus = taskStatusProjectionRepo.findByTaskId(event.taskId) ?: throw Exception()
-                taskStatus.taskTitle = event.title;
-                taskStatus.taskUpdatedAt = System.currentTimeMillis();
-                taskStatusProjectionRepo.save(taskStatus);
+                val task = taskProjectionRepo.findByTaskId(event.taskId) ?: throw Exception();
+                task.taskTitle = event.title;
+                task.taskUpdatedAt = System.currentTimeMillis();
+                taskProjectionRepo.save(task);
             }
 
             `when`(TaskCreatedEvent::class) { event ->
-                taskStatusProjectionRepo.save(TaskStatusProjection(event.statusId, null, event.taskId, event.createdAt,
-                        null, event.taskTitle, event.projectId, null))
+                taskProjectionRepo.save(TaskProjection(event.taskId, event.statusId, event.createdAt, event.createdAt,
+                        event.taskTitle, event.projectId, null))
             }
         }
 
         subscriptionsManager.createSubscriber(ProjectAggregate::class, "ProjectAggregateSubscriberTSProjection") {
 
             `when`(StatusCreatedEvent::class) { event ->
-                taskStatusProjectionRepo.save(TaskStatusProjection(event.statusId, event.statusName, null, event.createdAt, null, null, event.projectId, null))
+                taskStatusProjectionRepo.save(TaskStatusProjection(event.statusId, event.statusName))
             }
 
         }
     }
 }
 
-@Document("task-status-projection") //todo: в доке это было 2 таблицы
+@Document("task-status-projection")
 data class TaskStatusProjection(
+        @Id
         var statusId: UUID?,
-        var statusName: String?,
+        var statusName: String?
+)
+
+@Document("task-projection")
+data class TaskProjection(
+        @Id
         var taskId: UUID?,
+        var statusId: UUID?,
         var taskCreatedAt: Long?,
         var taskUpdatedAt: Long?,
         var taskTitle: String?,
@@ -75,8 +82,9 @@ data class TaskStatusProjection(
 )
 
 @Repository
-interface TaskStatusProjectionRepo : MongoRepository<TaskStatusProjection, UUID> {
-    fun findByTaskId(taskId: UUID): TaskStatusProjection?
-    fun findByStatusIdAndStatusNameNotNull(statusId: UUID): TaskStatusProjection?
-    fun findAllByTaskIdNotNull(): List<TaskStatusProjection>
+interface TaskStatusesProjectionRepo : MongoRepository<TaskStatusProjection, UUID>;
+
+@Repository
+interface TaskProjectionRepo : MongoRepository<TaskProjection, UUID> {
+    fun findByTaskId(task: UUID): TaskProjection
 }

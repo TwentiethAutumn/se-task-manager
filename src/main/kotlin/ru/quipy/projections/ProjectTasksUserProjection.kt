@@ -84,6 +84,7 @@ class ProjectTasksRelation(
 
 @Document("project-task-user-projection")
 data class ProjectTasksUserProjection(
+        @Id
         var projectId: UUID,
         var createdAt: Long,
         var updatedAt: Long,
@@ -95,12 +96,12 @@ data class ProjectTasksUserProjection(
 )
 
 data class TaskEntity(
-    var taskId: UUID,
-    var projectId: UUID,
-    var statusId: UUID,
-    var title: String,
-    var createdAt: Long)
+        var taskId: UUID,
+        var projectId: UUID,
+        var statusId: UUID,
+        var title: String,
+        var createdAt: Long)
 @Repository
 interface ProjectTaskUserRepo : MongoRepository<ProjectTasksUserProjection, UUID> {
-    fun findByProjectId(projectId: UUID) : ProjectTasksUserProjection?;
+    fun findByProjectId(projectId: UUID) : ProjectTasksUserProjection;
 }

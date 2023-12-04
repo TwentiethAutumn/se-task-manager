@@ -3,6 +3,7 @@ package ru.quipy.projections
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Component
@@ -42,4 +43,8 @@ data class ProjectUserProjection(
 )
 
 @Repository
-interface ProjectUserProjectionRepo : MongoRepository<ProjectUserProjection, UUID>;
+interface ProjectUserProjectionRepo : MongoRepository<ProjectUserProjection, UUID> {
+    fun findAllByProjectId(projectId: UUID) : List<ProjectUserProjection>;
+
+    fun findAllByUserId(userId: UUID) : List<ProjectUserProjection>;
+}

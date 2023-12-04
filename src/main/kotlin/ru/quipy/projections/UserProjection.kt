@@ -42,4 +42,8 @@ data class UserProjection(
 )
 
 @Repository
-interface UserProjectionRepo : MongoRepository<UserProjection, UUID>
+interface UserProjectionRepo : MongoRepository<UserProjection, UUID> {
+    fun existsByNickname(nickname: String): Boolean;
+
+    fun findByNicknameContaining(substring: String) : List<UserProjection>;
+}
