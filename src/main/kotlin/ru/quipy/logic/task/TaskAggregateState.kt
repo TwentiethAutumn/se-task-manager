@@ -14,7 +14,7 @@ class TaskAggregateState : AggregateState<UUID, TaskAggregate> {
 
     lateinit var statusId: UUID
     lateinit var projectId: UUID
-    var assignedUserId: UUID? = null;
+    var assignedUserIds: MutableList<UUID> = ArrayList<UUID>()
 
     override fun getId() = taskId
     @StateTransitionFunc
@@ -25,8 +25,10 @@ class TaskAggregateState : AggregateState<UUID, TaskAggregate> {
 
     @StateTransitionFunc
     fun userAssignedApply(event: UserAssignedToTaskEvent) {
-        assignedUserId = event.userId
-        updatedAt = createdAt
+        if (!assignedUserIds.contains(event.userId)){
+            assignedUserIds.add(event.userId)
+            updatedAt = createdAt
+        }
     }
 
     @StateTransitionFunc

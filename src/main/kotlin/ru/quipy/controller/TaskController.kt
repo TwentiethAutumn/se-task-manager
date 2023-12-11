@@ -22,7 +22,8 @@ class TaskController (
     @PostMapping("/{taskId}/{userId}")
     fun assignUserToTask(@PathVariable taskId: UUID, @PathVariable userId: UUID) : UserAssignedToTaskEvent {
         return taskEsService.update(taskId) {
-            it.assignUserToTask(userId) //todo назначать несколько людей тоже можно
+            it.assignUserToTask(userId) // TODO: назначать несколько людей тоже можно
+            //fixed in TaskAggregateState
         }
     }
 
@@ -42,15 +43,11 @@ class TaskController (
         }
     }
 
-    @GetMapping("/{taskId}")
-    fun getTask(@PathVariable taskId: UUID) : TaskAggregateState? {
-        return taskEsService.getState(taskId) //todo для запросов на чтение используем проекции
-    }
-
     @PostMapping("/assignStatus")
     fun assignStatusToTask(@RequestParam taskId: UUID, @RequestParam statusId: UUID) : StatusAssignedToTaskEvent {
         return taskEsService.update(taskId) {
-            it.assignStatusToTask(statusId) //todo проверить, что пользователь сам состоит в проекте
+            it.assignStatusToTask(statusId) // TODO: проверить, что пользователь сам состоит в проекте
+            //a more informative description of the edit is required
         }
     }
 }

@@ -6,15 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.quipy.api.project.ProjectAggregate
-import ru.quipy.api.project.ProjectCreatedEvent
-import ru.quipy.api.project.StatusCreatedEvent
-import ru.quipy.api.project.UserAssignedToProjectEvent
+import ru.quipy.api.project.*
 import ru.quipy.core.EventSourcingService
-import ru.quipy.logic.project.ProjectAggregateState
-import ru.quipy.logic.project.assignUser
-import ru.quipy.logic.project.create
-import ru.quipy.logic.project.createStatus
+import ru.quipy.logic.project.*
 import java.util.*
 
 @RestController
@@ -29,24 +23,46 @@ class ProjectController(
     }
 
     @PostMapping("/{projectId}/statuses")
-    fun createStatus(@PathVariable projectId: UUID, @RequestParam title: String) : StatusCreatedEvent{ //todo add color
+    fun createStatus(
+        @PathVariable projectId: UUID,
+        @RequestParam title: String,
+        @RequestParam color: String
+    ) : StatusCreatedEvent {
         return projectEsService.update(projectId){
-            it.createStatus(title) //todo проверить, что пользователь сам состоит в проекте
+            it.createStatus(title, color) // TODO: проверить, что пользователь сам состоит в проекте
+            //a more informative description of the edit is required
         }
     }
 
-    //todo delete status
-    //todo edit status
+    // TODO: delete status
+    @PostMapping("/{projectId}/deleteStatus")
+    fun deleteStatus(
+        @PathVariable projectId: UUID,
+        @RequestParam statusId: UUID
+    ) : StatusDeletedEvent {
+        return projectEsService.update(projectId){
+            it.deleteStatus(statusId)
+        }
+    }
 
-    @GetMapping("/{projectId}")
-    fun getProject(@PathVariable projectId: UUID) : ProjectAggregateState? {
-        return projectEsService.getState(projectId) //todo для запросов на чтение используем проекции
+    // TODO: edit status
+    @PostMapping("/{projectId}/editStatus")
+    fun editStatus(
+        @PathVariable projectId: UUID,
+        @RequestParam statusId: UUID,
+        @RequestParam title: String,
+        @RequestParam color: String,
+    ) : StatusEditedEvent {
+        return projectEsService.update(projectId) {
+            it.editStatus(statusId, title, color)
+        }
     }
 
     @PostMapping("/{projectId}/{userId}")
     fun assignUserToProject(@PathVariable projectId: UUID, @PathVariable userId: UUID) : UserAssignedToProjectEvent {
         return projectEsService.update(projectId) {
-            it.assignUser(userId) //todo проверить, что пользователь сам состоит в проекте
+            it.assignUser(userId) // TODO: проверить, что пользователь сам состоит в проекте
+            //a more informative description of the edit is required
         }
     }
 }

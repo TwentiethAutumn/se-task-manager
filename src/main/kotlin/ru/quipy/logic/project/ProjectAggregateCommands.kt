@@ -1,8 +1,6 @@
 package ru.quipy.logic.project
 
-import ru.quipy.api.project.ProjectCreatedEvent
-import ru.quipy.api.project.StatusCreatedEvent
-import ru.quipy.api.project.UserAssignedToProjectEvent
+import ru.quipy.api.project.*
 import java.util.*
 
 fun ProjectAggregateState.create(id: UUID, title: String, creatorId: String): ProjectCreatedEvent {
@@ -20,9 +18,25 @@ fun ProjectAggregateState.assignUser(userId: UUID) : UserAssignedToProjectEvent 
     )
 }
 
-fun ProjectAggregateState.createStatus(name: String): StatusCreatedEvent {
+fun ProjectAggregateState.createStatus(name: String, color: String): StatusCreatedEvent {
     if (projectStatuses.values.any { it.name == name }) {
         throw IllegalArgumentException("Status already exists: $name")
     }
-    return StatusCreatedEvent(projectId = this.getId(), statusId = UUID.randomUUID(), statusName = name)
+    return StatusCreatedEvent(projectId = this.getId(), statusId = UUID.randomUUID(), statusName = name, color = color)
+}
+
+fun ProjectAggregateState.editStatus(statusId: UUID, name: String, color: String): StatusEditedEvent {
+    return StatusEditedEvent(
+        projectId = this.getId(),
+        statusId = statusId,
+        title = name,
+        color = color,
+    )
+}
+
+fun ProjectAggregateState.deleteStatus(statusId: UUID): StatusDeletedEvent {
+    return StatusDeletedEvent(
+        projectId = this.getId(),
+        statusId = statusId
+    )
 }

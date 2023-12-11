@@ -35,7 +35,19 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 
     @StateTransitionFunc
     fun statusCreatedApply(event: StatusCreatedEvent) {
-        projectStatuses[event.statusId] = StatusEntity(event.statusId, event.statusName)
+        projectStatuses[event.statusId] = StatusEntity(event.statusId, event.statusName, event.color)
+        updatedAt = createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusEditedApply(event: StatusEditedEvent){
+        projectStatuses[event.statusId] = StatusEntity(event.statusId, event.title, event.color)
+        updatedAt = createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusDeletedApply(event: StatusDeletedEvent){
+        projectStatuses.remove(event.statusId)
         updatedAt = createdAt
     }
 }
